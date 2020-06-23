@@ -1,0 +1,15 @@
+routes:
+  app_user_create:
+    content_type: json
+    permission:
+    token_need: false
+
+  app_workshop_create:
+    content_type: json
+    permission:
+    token_need: false
+
+  app_workshop_change:
+    content_type: json
+    permission:
+    token_need: false

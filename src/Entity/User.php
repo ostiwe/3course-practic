@@ -15,27 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class User
 {
-	const CAN_CREATE_USERS = 1 << 0;
-	const CAN_REMOVE_USERS = 1 << 1;
-	const CAN_ADD_WORKSHOP = 1 << 2;
-	const CAN_REMOVE_WORKSHOP = 1 << 3;
-	const CAN_RENAME_WORKSHOP = 1 << 4;
-	const CAN_CREATE_AUTO = 1 << 5;
-	const CAN_REMOVE_AUTO = 1 << 6;
-	const CAN_CREATE_AUTO_MODELS = 1 << 7;
-	const CAN_CREATE_TOKENS = 1 << 8;
 
-
-	const DEFAULT_USER = self::CAN_CREATE_AUTO | self::CAN_REMOVE_AUTO;
-	const ADMIN =
-		self::DEFAULT_USER |
-		self::CAN_CREATE_USERS |
-		self::CAN_REMOVE_USERS |
-		self::CAN_ADD_WORKSHOP |
-		self::CAN_REMOVE_WORKSHOP |
-		self::CAN_RENAME_WORKSHOP |
-		self::CAN_CREATE_AUTO_MODELS |
-		self::CAN_CREATE_TOKENS;
 
 	/**
 	 * @ORM\Id()
@@ -61,19 +41,30 @@ class User
 	private $workshop;
 
 	/**
-	 * @ORM\OneToMany(targetEntity=AccessToken::class, mappedBy="owner", orphanRemoval=true)
-	 */
-	private $accessTokens;
-
-	/**
 	 * @ORM\Column(type="integer")
 	 */
 	private $mask;
+
+	/**
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $password;
+
+	/**
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $login;
+
+	/**
+	 * @ORM\OneToMany(targetEntity=AccessToken::class, mappedBy="owner", orphanRemoval=true, fetch="EAGER")
+	 */
+	private $accessTokens;
 
 	public function __construct()
 	{
 		$this->accessTokens = new ArrayCollection();
 	}
+
 
 	public function getId(): ?int
 	{
@@ -116,6 +107,66 @@ class User
 		return $this;
 	}
 
+
+	public function getMask(): ?int
+	{
+		return $this->mask;
+	}
+
+	public function setMask(int $mask): self
+	{
+		$this->mask = $mask;
+
+		return $this;
+	}
+
+	public static function loadValidatorMetadata(ClassMetadata $metadata)
+	{
+		$metadata->addPropertyConstraints('firstName', [
+			new NotBlank(),
+			new Length(['min' => 3, 'allowEmptyString' => false]),
+		]);
+		$metadata->addPropertyConstraints('lastName', [
+			new NotBlank(),
+			new Length(['min' => 3, 'allowEmptyString' => false]),
+		]);
+	}
+
+	public function getPassword(): ?string
+	{
+		return $this->password;
+	}
+
+	public function setPassword(string $password): self
+	{
+		$this->password = $password;
+
+		return $this;
+	}
+
+	public function export(): array
+	{
+		return [
+			'id' => $this->id,
+			'first_name' => $this->firstName,
+			'last_name' => $this->lastName,
+			'mask' => $this->mask,
+			'workshop_id' => $this->workshop ? $this->workshop->getId() : null,
+		];
+	}
+
+	public function getLogin(): ?string
+	{
+		return $this->login;
+	}
+
+	public function setLogin(string $login): self
+	{
+		$this->login = $login;
+
+		return $this;
+	}
+
 	/**
 	 * @return Collection|AccessToken[]
 	 */
@@ -145,29 +196,5 @@ class User
 		}
 
 		return $this;
-	}
-
-	public function getMask(): ?int
-	{
-		return $this->mask;
-	}
-
-	public function setMask(int $mask): self
-	{
-		$this->mask = $mask;
-
-		return $this;
-	}
-
-	public static function loadValidatorMetadata(ClassMetadata $metadata)
-	{
-		$metadata->addPropertyConstraints('firstName', [
-			new NotBlank(),
-			new Length(['min' => 3, 'allowEmptyString' => false]),
-		]);
-		$metadata->addPropertyConstraints('lastName', [
-			new NotBlank(),
-			new Length(['min' => 3, 'allowEmptyString' => false]),
-		]);
 	}
 }

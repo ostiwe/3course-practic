@@ -18,11 +18,6 @@ class AccessToken
 	 */
 	private $id;
 
-	/**
-	 * @ORM\ManyToOne(targetEntity=User::class, inversedBy="accessTokens")
-	 * @ORM\JoinColumn(nullable=false)
-	 */
-	private $owner;
 
 	/**
 	 * @ORM\Column(type="string", length=255)
@@ -44,22 +39,17 @@ class AccessToken
 	 */
 	private $mask;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity=User::class, inversedBy="accessTokens", fetch="EAGER")
+	 * @ORM\JoinColumn(nullable=false)
+	 */
+	private $owner;
+
 	public function getId(): ?int
 	{
 		return $this->id;
 	}
 
-	public function getOwner(): ?User
-	{
-		return $this->owner;
-	}
-
-	public function setOwner(?User $owner): self
-	{
-		$this->owner = $owner;
-
-		return $this;
-	}
 
 	public function getValue(): ?string
 	{
@@ -129,5 +119,17 @@ class AccessToken
 			'created_at' => $this->createdAt,
 			'expired_at' => $this->expiredAt,
 		];
+	}
+
+	public function getOwner(): ?User
+	{
+		return $this->owner;
+	}
+
+	public function setOwner(?User $owner): self
+	{
+		$this->owner = $owner;
+
+		return $this;
 	}
 }

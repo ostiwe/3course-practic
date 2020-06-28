@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\AccessToken;
+use App\Entity\User;
 use App\ErrorHelper;
 use App\Services\RequestStorage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -77,8 +78,7 @@ class RequestSubscriber extends AbstractController implements EventSubscriberInt
 
 	public function accessTokenMiddleware()
 	{
-		$token = $this->request->headers->get('token');
-
+		$token = $this->request->headers->get('X-AUTH-TOKEN');
 		if (!$token || $token === '')
 			return ErrorHelper::authorizationFailed(ErrorHelper::AUTH_FAILED_TOKEN);
 
@@ -88,18 +88,15 @@ class RequestSubscriber extends AbstractController implements EventSubscriberInt
 			->getRepository(AccessToken::class)
 			->findOneBy(['value' => $token]);
 
-
 		if (!$accessToken)
 			return ErrorHelper::authorizationFailed(ErrorHelper::AUTH_FAILED_TOKEN_NOT_FOUND);
 
 		if ($this->needPermission !== null && ($accessToken->getMask() & $this->needPermission) != $this->needPermission)
 			return ErrorHelper::authorizationFailed(ErrorHelper::AUTH_FAILED_NOT_PERMISSION);
 
-		$tokenInfo['token'] = $accessToken;
-		$tokenInfo['user'] = $accessToken->getOwner();
 
-		$this->storage->set('user_info', $tokenInfo['user']);
-		$this->storage->set('token_info', $tokenInfo['token']);
+		$this->storage->set('user_info', $accessToken->getOwner());
+		$this->storage->set('token_info', $accessToken);
 
 		return [
 			'error' => false,

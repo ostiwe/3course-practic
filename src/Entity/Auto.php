@@ -43,6 +43,11 @@ class Auto
 	 */
 	private $workshop;
 
+	/**
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $name;
+
 	public function getId(): ?int
 	{
 		return $this->id;
@@ -113,10 +118,25 @@ class Auto
 		return [
 			'id' => $this->id,
 			'model_id' => $this->model->getId(),
+			'model_name' => $this->model->getName(),
 			'workshop_id' => $this->workshop->getId(),
+			'workshop_name' => $this->workshop->getName(),
+			'name' => $this->name,
 			'created_at' => $this->createdAt,
 			'serial_number' => $this->serialNumber,
 			'power' => $this->power,
 		];
+	}
+
+	public function getName(): ?string
+	{
+		return $this->name;
+	}
+
+	public function setName(string $name): self
+	{
+		$this->name = $name;
+
+		return $this;
 	}
 }

@@ -66,13 +66,13 @@ class AutoModelsController extends AbstractController
 
 	}
 
-	/** @Route("/auto/models",methods={"GET"}) */
+	/** @Route("/models",methods={"GET"}) */
 	public function index()
 	{
-		$autoList = $this->getDoctrine()->getRepository(AutoModel::class)->findAll();
+		$modelsList = $this->getDoctrine()->getRepository(AutoModel::class)->findAll();
 
-		$autos = array_map(function (AutoModel $auto) { return $auto->export(); }, $autoList);
+		$models = array_map(function (AutoModel $auto) { return $auto->export(); }, $modelsList);
 
-		return $this->json(['success' => true, 'items' => $autos]);
+		return $this->json(['success' => true, 'items' => $models]);
 	}
 }

@@ -130,4 +130,13 @@ class WorkshopController extends AbstractController
 
 	}
 
+	/** @Route("/workshops",methods={"GET"}) */
+	public function index()
+	{
+		$workshops = $this->getDoctrine()->getRepository(Workshop::class)->findAll();
+
+		$workshopsList = array_map(function (Workshop $workshop) { return $workshop->export(); }, $workshops);
+
+		return $this->json(['success' => true, 'items' => $workshopsList]);
+	}
 }

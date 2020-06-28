@@ -13,3 +13,28 @@ routes:
     content_type: json
     permission:
     token_need: false
+
+  app_user_getinfo:
+    content_type:
+    permission:
+    token_need: true
+
+  app_auth_index:
+    content_type: json
+    permission: null
+    token_need: true
+
+  app_auth_login:
+    content_type: json
+    permission:
+    token_need:
+
+  app_auth_register:
+    content_type: json
+    permission:
+    token_need:
+
+  app_auth_logout:
+    content_type:
+    permission:
+    token_need: true

@@ -16,39 +16,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
 {
-	/**
-	 * @Route("/users",methods={"POST"})
-	 * @param Request            $request
-	 * @param ValidatorInterface $validator
-	 *
-	 * @return JsonResponse
-	 */
-	public function create(Request $request, ValidatorInterface $validator)
+
+	/** @Route("/user/{userId}") */
+	public function getUs($userId)
 	{
-		$body = json_decode($request->getContent(), true);
-
-		$newUser = (new User())
-			->setFirstName($body['first_name'] ?? '')
-			->setLastName($body['last_name'] ?? '')
-			->setMask(User::DEFAULT_USER);
-
-		$errors = $validator->validate($newUser);
-
-		if ($errors->count() > 0) {
-			$errorsList = [];
-			/** @var ConstraintViolation $error */
-			foreach ($errors as $error) {
-				$errorsList[$error->getPropertyPath()][] = $error->getMessage();
-			}
-			return $this->json(ErrorHelper::requestWrongParams($errorsList));
-		}
-
-
-		$this->getDoctrine()->getManager()->persist($newUser);
-		$this->getDoctrine()->getManager()->flush();
-
-		return $this->json(['' => '']);
-
+		var_dump($this->getDoctrine()->getRepository(User::class)->find($userId));
+		return $this->json([]);
 	}
 
 	/**
@@ -83,6 +56,18 @@ class UserController extends AbstractController
 		$em->flush();
 
 		return $this->json(['success' => true, 'workshop_set' => $workshop->getId()]);
+	}
+
+	/**
+	 * @Route("/users",methods={"GET"})
+	 */
+	public function index()
+	{
+		$users = $this->getDoctrine()->getRepository(User::class)->findAll();
+		$usersList = array_map(function (User $user) { return $user->export(); }, $users);
+
+		return $this->json(['success' => true, 'items' => $usersList]);
+
 	}
 
 }

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   web:
-    container_name: app_nginx
+    container_name: api_app_nginx
     image: nginx
     volumes:
       - ./docker/nginx/templates:/etc/nginx/templates
@@ -23,7 +23,7 @@ services:
       - php-fpm
 
   db:
-    container_name: app_db
+    container_name: api_app_db
     image: mysql
     environment:
       - MYSQL_DATABASE=corp
@@ -34,13 +34,13 @@ services:
       - 3306:3306
 
   redis:
-    container_name: app_redis
+    container_name: api_app_redis
     image: redis
     ports:
       - 6379:6379
 
   composer:
-    container_name: app_composer
+    container_name: api_app_composer
     image: composer
     volumes:
       - .:/usr/share/nginx/html
@@ -50,7 +50,7 @@ services:
 
 
   php-fpm:
-    container_name: app_phpfpm
+    container_name: api_app_phpfpm
     build: .
     volumes:
       - .:/usr/share/nginx/html
